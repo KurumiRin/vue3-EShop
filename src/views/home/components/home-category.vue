@@ -1,18 +1,27 @@
 <template>
-  <div class='home-category'>
+  <div class='home-category' @mouseleave="categoryId = ''">
     <ul class="menu">
-      <li v-for="item in menuList" :key="item.id" @mouseenter="categoryId = item.id">
+      <li v-for="item in menuList" :key="item.id" @mouseenter="categoryId = item.id" :class="{active:item.id === categoryId}">
         <RouterLink :to="`/category/${item.id}`">{{item.name}}</RouterLink>
-        <RouterLink :to="`/category/sub/${sub.id}`" v-for="sub in item.children" :key="sub.id">
-          {{sub.name}}
-        </RouterLink>
+        <template v-if="item.children">
+          <RouterLink :to="`/category/sub/${sub.id}`" v-for="sub in item.children" :key="sub.id">
+            {{sub.name}}
+          </RouterLink>
+        </template>
+        <template v-else>
+          <XtxSkeleton width="60px" height="18px" bg="rgba(255,255,255,0.2)" style="margin-right: 5px;"></XtxSkeleton>
+          <XtxSkeleton width="50px" height="18px" bg="rgba(255,255,255,0.2)"></XtxSkeleton>
+        </template>
       </li>
     </ul>
 
     <!-- 弹层 -->
     <div class="layer">
-      <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
-      <ul>
+      <h4>
+        {{ currentCategory?.id === 'brand' ? '品牌' : '分类' }}推荐
+        <small>根据您的购买或浏览记录推荐</small>
+      </h4>
+      <ul v-if="currentCategory?.goods">
         <li v-for="item in currentCategory?.goods" :key="item.id">
           <RouterLink to="/">
             <img :src="item.picture" alt="" />
@@ -24,6 +33,20 @@
           </RouterLink>
         </li>
       </ul>
+      <ul v-if="currentCategory?.brands">
+        <li class="brand" v-for="item in currentCategory.brands" :key="item.id">
+          <RouterLink to="/">
+            <img :src="item.picture" alt="" />
+            <div class="info">
+              <p class="place">
+                <i class="iconfont icon-dingwei"></i>{{ item.place }}
+              </p>
+              <p class="name ellipsis">{{ item.name }}</p>
+              <p class="desc ellipsis-2">{{ item.desc }}</p>
+            </div>
+          </RouterLink>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -31,17 +54,23 @@
 <script>
 import { computed, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
+import { findBrand } from '@/api/home'
 export default {
   name: 'HomeCategory',
   setup() {
     const store = useStore()
+    const brand = reactive({
+      id: 'brand',
+      name: '品牌',
+      // gooods: [],
+      children: [{ id: 'brand-children', name: '品牌推荐' }],
+      //  增加brands数据，用于存储品牌的数据
+      brands: []
+    })
+    findBrand().then(res => {
+      brand.brands = res.result
+    })
     const menuList = computed(() => {
-      const brand = reactive({
-        id: 'brand',
-        name: '品牌',
-        // gooods: [],
-        children: [{ id: 'brand-children', name: '品牌推荐' }]
-      })
       const list = store.state.category.list.map((item) => {
         return {
           id: item.id,
@@ -54,11 +83,9 @@ export default {
       return list
     })
     const categoryId = ref('')
-
     const currentCategory = computed(() => {
       return menuList.value.find(item => item.id === categoryId.value)
     })
-
     return {
       menuList,
       categoryId,
@@ -80,9 +107,11 @@ export default {
       padding-left: 40px;
       height: 50px;
       line-height: 50px;
-      &:hover {
+      &:hover,
+      &.active {
         background: @xtxColor;
       }
+
       a {
         margin-right: 4px;
         color: #fff;
@@ -159,12 +188,42 @@ export default {
           }
         }
       }
+      li.brand {
+        height: 180px;
+        a {
+          align-items: flex-start;
+          img {
+            width: 120px;
+            height: 160px;
+          }
+          .info {
+            p {
+              margin-top: 8px;
+            }
+            .place {
+              color: #999;
+            }
+          }
+        }
+      }
     }
   }
   &:hover {
     .layer {
       display: block;
     }
+  }
+}
+
+.xtx-skeleton {
+  animation: fade 1s linear infinite alternate;
+}
+@keyframes fade {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>
