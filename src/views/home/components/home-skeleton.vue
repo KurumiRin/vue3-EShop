@@ -1,6 +1,6 @@
 <template>
   <div class='home-skeleton'>
-    <div class="item" v-for="i in 4" :key="i" :style="{backgroundColor: '#f0f9f4'}">
+    <div class="item" v-for="i in 4" :key="i" :style="{backgroundColor: bg}">
       <XtxSkeleton bg="#e4e4e4" width="306px" height="306px" animated />
       <XtxSkeleton bg="#e4e4e4" width="160px" height="24px" animated />
       <XtxSkeleton bg="#e4e4e4" width="120px" height="24px" animated />
@@ -10,7 +10,13 @@
 
 <script>
 export default {
-  name: 'HomeSkeleton'
+  name: 'HomeSkeleton',
+  props: {
+    bg: {
+      type: String,
+      default: '#f0f9f4'
+    }
+  }
 }
 </script>
 
