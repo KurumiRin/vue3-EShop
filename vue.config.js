@@ -8,5 +8,11 @@ module.exports = {
         path.join(__dirname, './src/assets/styles/mixins.less')
       ]
     }
+  },
+  devServer: {
+    overlay: {
+      errors: true,
+      warnings: false
+    }
   }
 }

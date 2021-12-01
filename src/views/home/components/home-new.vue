@@ -1,19 +1,21 @@
 <template>
-  <HomePanel title="新鲜好物" subTitle="新鲜出炉 品质靠谱">
+  <HomePanel ref="target" title="新鲜好物" subTitle="新鲜出炉 品质靠谱">
     <template #right>
       <XtxMore to="/"></XtxMore>
     </template>
-    <!-- 面板内容 -->
-    <ul class="goods-list" v-if="goods.length">
-      <li v-for="item in goods" :key="item.id">
-        <RouterLink to="/">
-          <img :src="item.picture" alt="" />
-          <p class="name ellipsis">{{item.name}}</p>
-          <p class="price">&yen;{{item.price}}</p>
-        </RouterLink>
-      </li>
-    </ul>
-    <HomeSkeleton v-else></HomeSkeleton>
+    <Transition name="fade">
+      <!-- 面板内容 -->
+      <ul class="goods-list" v-if="goods.length">
+        <li v-for="item in goods" :key="item.id">
+          <RouterLink to="/">
+            <img :src="item.picture" alt="" />
+            <p class="name ellipsis">{{item.name}}</p>
+            <p class="price">&yen;{{item.price}}</p>
+          </RouterLink>
+        </li>
+      </ul>
+      <HomeSkeleton bg="#fff" v-else></HomeSkeleton>
+    </Transition>
   </HomePanel>
 </template>
 
@@ -21,7 +23,8 @@
 import HomePanel from './home-panel.vue'
 import HomeSkeleton from './home-skeleton.vue'
 import { findNew } from '@/api/home'
-import { ref } from 'vue'
+// import { ref } from 'vue'
+import { useLazyData } from '@/hooks'
 export default {
   name: 'HomeNew',
   components: {
@@ -29,12 +32,14 @@ export default {
     HomeSkeleton
   },
   setup(props) {
-    const goods = ref([])
-    findNew().then(data => {
-      goods.value = data.result
-    })
+    // const goods = ref([])
+    // findNew().then(data => {
+    //   goods.value = data.result
+    // })
+    const { target, list: goods } = useLazyData(findNew)
     return {
-      goods
+      goods,
+      target
     }
   }
 }
