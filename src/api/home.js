@@ -26,3 +26,25 @@ export function findBanner() {
     url: '/home/banner'
   })
 }
+
+/**
+ * 新鲜好物
+ * @returns Promise
+ */
+export function findNew() {
+  return request({
+    method: 'get',
+    url: 'home/new'
+  })
+}
+
+/**
+ * 人气推荐
+ * @returns Promise
+ */
+export function findHot() {
+  return request({
+    method: 'get',
+    url: 'home/hot'
+  })
+}
