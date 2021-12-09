@@ -40,6 +40,9 @@ export function useLazyData(apiFn) {
           list.value = res.result
         })
       }
+    },
+    {
+      threshold: 0
     }
   )
   //  return出target，当引动该hooks时将target绑定给指定DOM

@@ -48,3 +48,25 @@ export function findHot() {
     url: 'home/hot'
   })
 }
+
+/**
+ * 获取商品数据
+ * @returns Promise
+ */
+export function findGoods() {
+  return request({
+    method: 'get',
+    url: 'home/goods'
+  })
+}
+
+/**
+ * 获取专题数据
+ * @returns Promise
+ */
+export function findSpecial() {
+  return request({
+    method: 'get',
+    url: 'home/special'
+  })
+}
