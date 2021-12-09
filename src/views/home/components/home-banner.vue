@@ -31,13 +31,11 @@ export default {
   z-index: 98;
   background-color: pink;
 
-  ::v-deep {
-    .carousel-btn.prev {
-      left: 270px !important;
-    }
-    .carousel-indicator {
-      padding-left: 250px !important;
-    }
+  :deep(.carousel-btn.prev) {
+    left: 270px !important;
+  }
+  :deep(.carousel-indicator) {
+    padding-left: 250px !important;
   }
 }
 </style>
