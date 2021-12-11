@@ -12,7 +12,7 @@
 import { useVModel } from '@vueuse/core'
 export default {
   name: 'XtxCheckbox',
-  emits: ['change'],
+  // emits: ['change', 'update:modelValue'],
   props: {
     modelValue: {
       type: Boolean,
@@ -33,11 +33,10 @@ export default {
     //     immediate: true
     //   }
     // )
-
     const checked = useVModel(props, 'modelValue', emit)
     const change = () => {
-      const newVal = checked.value = !checked.value
-      // checked.value = newVal
+      const newVal = !checked.value
+      checked.value = newVal
       emit('change', newVal)
     }
     return {
