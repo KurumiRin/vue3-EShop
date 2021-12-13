@@ -1,5 +1,5 @@
-import { onBeforeMount, onMounted, ref } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import { onBeforeMount, onMounted, ref, onBeforeUnmount } from 'vue'
+import { useIntersectionObserver, useIntervalFn } from '@vueuse/core'
 
 export function useWindowScroll() {
   const x = ref(0)
@@ -49,5 +49,33 @@ export function useLazyData(apiFn) {
   return {
     target,
     list
+  }
+}
+
+export function useCounter(num = 60) {
+  const time = ref(0)
+  // resume：开启定时器
+  // pause：清除定时器
+  const { pause, resume } = useIntervalFn(() => {
+    time.value--
+    if (time.value === 0) {
+      pause()
+    }
+  }, 1000, {
+    immediate: false
+  })
+
+  const start = () => {
+    time.value = num
+    resume()
+  }
+
+  onBeforeUnmount(() => {
+    pause()
+  })
+
+  return {
+    time,
+    start
   }
 }

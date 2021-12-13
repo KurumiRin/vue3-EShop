@@ -44,7 +44,7 @@
             <div class="input">
               <i class="iconfont icon-code"></i>
               <Field v-model="form.code" type="password" placeholder="请输入验证码" name="code" :class="{error:errors.code}" />
-              <span class="code">发送验证码</span>
+              <span class="code" @click="send">{{time === 0 ? '发送验证码' : `${time}s后重发`}}</span>
             </div>
             <div class="error" v-if="errors.code">
               <i class="iconfont icon-warning" />{{ errors.code }}
@@ -81,6 +81,11 @@ import { reactive, ref, watch } from 'vue'
 import { Form, Field, configure } from 'vee-validate'
 import { account, mobile, password, code, isAgree } from '@/utils/validate'
 import { Message } from '@/components/index'
+import { userAccountLogin, userMobileLogin, userMobileLoginMsg } from '@/api/user'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+// import { useIntervalFn } from '@vueuse/core'
+import { useCounter } from '@/hooks'
 configure({
   validateOnInput: true,
   validateOnBlur: true
@@ -118,22 +123,75 @@ export default {
 
     // 登录
     const target = ref(null)
+    const router = useRouter()
+    const store = useStore()
     const login = async () => {
-      // console.log('发送请求登录')
-      const valid = await target.value.validate()
-      if (valid) {
-        Message({ type: 'success', text: '校验成功' })
-      } else {
-        Message({ type: 'error', text: '校验失败' })
+      // 对整体表单进行校验
+      const result = await target.value.validate()
+      // 校验未通过
+      if (!result) return Message({ type: 'error', text: '校验未通过' })
+      try {
+        let res = null
+        if (isMsgLogin.value) {
+          res = await userMobileLogin(form.mobile, form.code)
+        } else {
+          res = await userAccountLogin(form.account, form.password)
+        }
+
+        Message({ type: 'success', text: '登录成功' })
+        store.commit('user/setProfile', res.result)
+        // 跳转到首页
+        router.push('/')
+      } catch (e) {
+        Message({ type: 'error', text: e.response.data.message })
       }
     }
 
+    // 验证码功能
+    // const time = ref(0)
+    // const timer = null
+    // resume：开启定时器
+    // pause：清除定时器
+    // const { pause, resume } = useIntervalFn(() => {
+    //   time.value--
+    //   if (time.value === 0) {
+    //     pause()
+    //   }
+    // }, 1000)
+    const { time, start } = useCounter()
+    const send = async () => {
+      // 对手机号进行验证
+      const valid = rules.mobile(form.mobile)
+      if (valid !== true) {
+        return target.value.setFieldError('mobile', valid)
+      }
+      try {
+        // 如果倒计时还没到0，不允许重复发送验证码
+        if (time.value > 0) return
+
+        // 发送验证码功能
+        const res = await userMobileLoginMsg(form.mobile)
+        console.log(res)
+        Message({ type: 'success', text: '发送成功' })
+        start()
+        // timer = setInterval(() => {
+        //   time.value--
+        //   if (time.value === 0) {
+        //     clearInterval(timer)
+        //   }
+        // }, 1000)
+      } catch (error) {
+        Message({ type: 'error', text: error.response.data.message })
+      }
+    }
     return {
       isMsgLogin,
       form,
       rules,
       target,
-      login
+      login,
+      send,
+      time
     }
   }
 }
