@@ -1,0 +1,36 @@
+<script>
+import { h } from 'vue'
+export default {
+  name: 'XtxBread',
+  props: {
+    separatorClass: {
+      type: String,
+      default: 'icon-angle-right'
+    }
+  },
+  render() {
+    const items = this.$slots.default()
+    const dymanicItems = []
+    items.forEach((item, i) => {
+      dymanicItems.push(item)
+      if (i < items.length - 1) {
+        dymanicItems.push(h('i', { class: `iconfont ${this.separatorClass}` }))
+      }
+    })
+    return h('div', { class: 'xtx-bread' }, dymanicItems)
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.xtx-bread {
+  display: flex;
+  padding: 25px 10px;
+  i {
+    font-size: 12px;
+    margin-left: 5px;
+    margin-right: 5px;
+    line-height: 22px;
+  }
+}
+</style>
