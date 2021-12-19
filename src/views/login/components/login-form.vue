@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { Form, Field, configure } from 'vee-validate'
 import { account, mobile, password, code, isAgree } from '@/utils/validate'
 import { Message } from '@/components/index'
@@ -89,7 +89,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 // import { useIntervalFn } from '@vueuse/core'
 import { useCounter } from '@/hooks'
-import QC from 'qc'
+// import QC from 'qc'
 configure({
   validateOnInput: true,
   validateOnBlur: true
@@ -189,12 +189,12 @@ export default {
       }
     }
 
-    onMounted(() => {
-      // window.QC.Login({
-      QC.Login({
-        btnId: 'qqLoginBtn'
-      })
-    })
+    // onMounted(() => {
+    //   // window.QC.Login({
+    //   QC.Login({
+    //     btnId: 'qqLoginBtn'
+    //   })
+    // })
     return {
       isMsgLogin,
       form,
