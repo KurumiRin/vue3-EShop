@@ -24,3 +24,30 @@ export function findTopCategory(id) {
     }
   })
 }
+
+/**
+ *  获取二级分类筛选条件数据
+ * @param {String} id -  二级分类ID
+ */
+export function findSubCategoryFilter(id) {
+  return request({
+    method: 'get',
+    url: '/category/sub/filter',
+    params: {
+      id
+    }
+  })
+}
+
+/**
+ * 获取二级分类下的商品数据
+ * @param {*} data
+ * @returns
+ */
+export function findSubCategoryGoods(data) {
+  return request({
+    method: 'post',
+    url: '/category/goods/temporary',
+    data
+  })
+}
