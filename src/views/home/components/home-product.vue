@@ -3,12 +3,12 @@
     <HomePanel :title="item.name" v-for="item in list" :key="item.id">
       <template v-slot:right>
         <div class="sub">
-          <RouterLink to="/" v-for="sub in item.children" :key="sub.id">{{sub.name}}</RouterLink>
+          <RouterLink :to="`/category/sub/${sub.id}`" v-for="sub in item.children" :key="sub.id">{{sub.name}}</RouterLink>
         </div>
         <XtxMore />
       </template>
       <div class="box">
-        <RouterLink class="cover" to="/">
+        <RouterLink class="cover" :to="`/category/${item.id}`">
           <img style="object-fit:cover" v-lazy="item.picture" alt="" />
           <strong class="label">
             <span>{{item.name}}馆</span>
@@ -18,7 +18,7 @@
         <ul class="goods-list">
           <li v-for="good in item.goods" :key="good.id">
             <div class="goods-item">
-              <RouterLink to="/" class="image">
+              <RouterLink :to="`/product/${good.id}`" class="image">
                 <img v-lazy="good.picture" alt="" />
               </RouterLink>
               <p class="name ellipsis-2">{{good.name}}</p>
