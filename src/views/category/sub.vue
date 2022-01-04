@@ -85,6 +85,7 @@ export default {
       reqParams.page = 1
       goodsList.value = []
       finished.value = false
+      onLoad()
     }
 
     const changeFilter = (filter) => {
