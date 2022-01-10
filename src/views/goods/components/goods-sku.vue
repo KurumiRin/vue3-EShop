@@ -20,7 +20,7 @@ export default {
       type: Object
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
     // spec: 规格
     // val: 规格的值
     const changeSelected = (spec, val) => {
@@ -38,6 +38,15 @@ export default {
         val.selected = true
       }
       updateDisabledStatus(props.goods.specs, pathMap)
+      const arr = getSelectedSpec(props.goods.specs).filter(v => v)
+      // 子传父，讲选择的sku信息传递给父组件
+
+      // 根据skuId获取到对应的sku信息
+      if (arr.length === props.goods.specs.length) {
+        const skuId = pathMap[arr.join('☆')]
+        const sku = props.goods.skus.find(item => item.id === skuId[0])
+        emit('changeSku', sku)
+      }
     }
 
     // 根据商品的skus得到一个可选的路径字典（对象）
@@ -45,8 +54,17 @@ export default {
     // 2.根据sku的specs属性，得到属性的子集
     // 3.根据这些子集组合成路径字典
     const pathMap = getPathMap(props.goods.skus)
-    updateDisabledStatus(props.goods.specs, pathMap)
 
+    // 设置规格默认选中
+    if (props.skuId) {
+      const sku = props.goods.skus.find(item => item.id === props.skuId)
+      props.goods.specs.forEach((item, index) => {
+        const name = sku.specs[index].valueName
+        item.values.find(val => val.name === name).selected = true
+      })
+    }
+    // 禁用状态
+    updateDisabledStatus(props.goods.specs, pathMap)
     return {
       changeSelected
     }
@@ -69,14 +87,12 @@ function getPathMap(skus) {
  * 控制按钮的禁用状态
  */
 function updateDisabledStatus(specs, pathMap) {
-  console.log(specs)
   specs.forEach((spec, index) => {
     // 获取选中的属性
     const selectedValues = getSelectedSpec(specs)
     spec.values.forEach(item => {
       selectedValues[index] = item.name
       const key = selectedValues.filter(v => v).join('☆')
-      console.log(key)
       item.disabled = !pathMap[key]
       // item.disabled = !pathMap[item.name]
     })
@@ -135,6 +151,7 @@ function getSelectedSpec(specs) {
         height: 30px;
         line-height: 28px;
         padding: 0 20px;
+        margin-bottom: 5px;
         .sku-state-mixin ();
       }
     }

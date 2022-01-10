@@ -20,21 +20,27 @@
           <!-- 名字区组件 -->
           <GooodsName :goods="goods"></GooodsName>
           <!-- 规格组件 -->
-          <GoodsSku v-if="goods.skus" :goods="goods"></GoodsSku>
+          <GoodsSku v-if="goods.skus" :goods="goods" @changeSku="changeSku"></GoodsSku>
+          <!-- 数量组件 -->
+          <XtxNumbox label="数量" v-model="num" :max="goods.inventory" />
+          <!-- 按钮组件 -->
+          <XtxButton type="primary" style="margin-top:20px;">加入购物车</XtxButton>
         </div>
       </div>
       <!-- 商品推荐 -->
-      <GoodsRelevant />
+      <GoodsRelevant :goodsId="goods.id"></GoodsRelevant>
       <!-- 商品详情 -->
       <div class="goods-footer">
         <div class="goods-article">
           <!-- 商品+评价 -->
-          <div class="goods-tabs"></div>
+          <GoodsTabs></GoodsTabs>
           <!-- 注意事项 -->
-          <div class="goods-warn"></div>
+          <GoodsWarn></GoodsWarn>
         </div>
         <!-- 24热榜+专题推荐 -->
-        <div class="goods-aside"></div>
+        <div class="goods-aside">
+          <GoodsHot v-for="item in hotArr" :key="item.id" :type="item.id" :title="item.title"></GoodsHot>
+        </div>
       </div>
     </div>
   </div>
@@ -45,17 +51,57 @@ import GoodsImage from './components/goods-image.vue'
 import GoodsSales from './components/goods-sales.vue'
 import GooodsName from './components/goods-name.vue'
 import GoodsSku from './components/goods-sku.vue'
+import GoodsTabs from './components/goods-tabs.vue'
+import GoodsWarn from './components/goods-warn.vue'
+import GoodsHot from './components/goods-hot.vue'
 import { useRoute } from 'vue-router'
 import { findGoods } from '@/api/product'
-import { ref, watch } from 'vue'
+import { provide, ref, watch } from 'vue'
 export default {
   name: 'XtxGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GooodsName, GoodsSku },
+  components: {
+    GoodsRelevant,
+    GoodsImage,
+    GoodsSales,
+    GooodsName,
+    GoodsSku,
+    GoodsTabs,
+    GoodsWarn,
+    GoodsHot
+  },
   setup() {
     //  获取商品的数据
     const goods = useGoods()
+    const changeSku = (sku) => {
+      goods.value.price = sku.price
+      goods.value.oldPrice = sku.oldPrice
+      goods.value.inventory = sku.inventory
+    }
+
+    const num = ref(1)
+    provide('goods', goods)
+
+    // 热榜的数据
+    const hotArr = ref([
+      {
+        id: 1,
+        title: '24小时热销榜'
+      },
+      {
+        id: 2,
+        title: '周热销榜'
+      },
+      {
+        id: 3,
+        title: '总热销榜'
+      }
+    ])
+
     return {
-      goods
+      goods,
+      changeSku,
+      num,
+      hotArr
     }
   }
 }
