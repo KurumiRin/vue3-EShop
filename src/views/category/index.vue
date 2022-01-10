@@ -9,7 +9,7 @@
         </Transition>
       </XtxBread>
       <!-- 轮播图 -->
-      <XtxCarousel :slides="slides" style="height:500px"></XtxCarousel>
+      <XtxCarousel :sliders="sliders" style="height:500px"></XtxCarousel>
       <!-- 全部分类 -->
       <!-- 所有二级分类 -->
       <div class="sub-list">
@@ -58,9 +58,9 @@ export default {
     })
 
     // 渲染轮播图结构
-    const slides = ref(null)
+    const sliders = ref(null)
     findBanner().then(res => {
-      slides.value = res.result
+      sliders.value = res.result
     })
 
     // 获取分类数据
@@ -80,7 +80,7 @@ export default {
     )
     return {
       category,
-      slides,
+      sliders,
       subList
     }
   }

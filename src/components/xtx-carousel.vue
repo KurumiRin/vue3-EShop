@@ -1,10 +1,18 @@
 <template>
   <div class="xtx-carousel" @mouseenter="stop" @mouseleave="play">
     <ul class="carousel-body">
-      <li class="carousel-item" :class="{fade:active === index}" v-for="(item,index) in slides" :key="item.id">
-        <RouterLink :to="item.hrefUrl">
+      <li class="carousel-item" :class="{fade:active === index}" v-for="(item,index) in sliders" :key="item.id">
+
+        <RouterLink v-if="item.hrefUrl" :to="item.hrefUrl">
           <img :src="item.imgUrl" alt="" />
         </RouterLink>
+        <div v-else class="slider">
+          <RouterLink v-for="goods in item" :key="goods.id" :to="`/product/${goods.id}`">
+            <img :src="goods.picture" alt="">
+            <p class="name ellipsis">{{goods.name}}</p>
+            <p class="price">&yen;{{goods.price}}</p>
+          </RouterLink>
+        </div>
       </li>
     </ul>
     <a href="javascript:;" class="carousel-btn prev" @click="prev">
@@ -14,7 +22,7 @@
       <i class="iconfont icon-angle-right"></i>
     </a>
     <div class="carousel-indicator">
-      <span v-for="(item,index) in slides" :key="item.id" :class="{active:active === index}" @mouseenter="active = index"></span>
+      <span v-for="(item,index) in sliders" :key="item.id" :class="{active:active === index}" @mouseenter="active = index"></span>
     </div>
   </div>
 </template>
@@ -24,7 +32,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 export default {
   name: 'XtxCarousel',
   props: {
-    slides: {
+    sliders: {
       type: Array,
       default: () => []
     },
@@ -44,7 +52,7 @@ export default {
       if (!props.autoPlay) return
       clearInterval(timer)
       timer = setInterval(() => {
-        if (active.value >= props.slides.length - 1) {
+        if (active.value >= props.sliders.length - 1) {
           active.value = 0
         } else {
           active.value++
@@ -66,14 +74,14 @@ export default {
 
     const prev = () => {
       if (active.value === 0) {
-        active.value = props.slides.length - 1
+        active.value = props.sliders.length - 1
       } else {
         active.value--
       }
     }
 
     const next = () => {
-      if (active.value === props.slides.length - 1) {
+      if (active.value === props.sliders.length - 1) {
         active.value = 0
       } else {
         active.value++
@@ -165,6 +173,32 @@ export default {
   &:hover {
     .carousel-btn {
       opacity: 1;
+    }
+  }
+}
+
+// 轮播商品
+.slider {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 40px;
+  > a {
+    width: 240px;
+    text-align: center;
+    img {
+      padding: 20px;
+      width: 230px !important;
+      height: 230px !important;
+    }
+    .name {
+      font-size: 16px;
+      color: #666;
+      padding: 0 40px;
+    }
+    .price {
+      font-size: 16px;
+      color: @priceColor;
+      margin-top: 15px;
     }
   }
 }
