@@ -24,7 +24,7 @@
           <!-- 数量组件 -->
           <XtxNumbox label="数量" v-model="num" :max="goods.inventory" />
           <!-- 按钮组件 -->
-          <XtxButton type="primary" style="margin-top:20px;">加入购物车</XtxButton>
+          <XtxButton type="primary" style="margin-top:20px;" @click="addCart">加入购物车</XtxButton>
         </div>
       </div>
       <!-- 商品推荐 -->
@@ -57,6 +57,8 @@ import GoodsHot from './components/goods-hot.vue'
 import { useRoute } from 'vue-router'
 import { findGoods } from '@/api/product'
 import { provide, ref, watch } from 'vue'
+import { Message } from '@/components'
+import { useStore } from 'vuex'
 export default {
   name: 'XtxGoodsPage',
   components: {
@@ -72,10 +74,15 @@ export default {
   setup() {
     //  获取商品的数据
     const goods = useGoods()
+    const currentSku = ref({})
     const changeSku = (sku) => {
-      goods.value.price = sku.price
-      goods.value.oldPrice = sku.oldPrice
-      goods.value.inventory = sku.inventory
+      if (sku.id) {
+        goods.value.price = sku.price
+        goods.value.oldPrice = sku.oldPrice
+        goods.value.inventory = sku.inventory
+      }
+      // 把传过来的sku保存起来
+      currentSku.value = sku
     }
 
     const num = ref(1)
@@ -96,12 +103,34 @@ export default {
         title: '总热销榜'
       }
     ])
+    const store = useStore()
+    const addCart = async () => {
+      if (!currentSku.value.id) {
+        return Message({ type: 'warn', text: '请选择完整信息' })
+      }
+      // 加入购物车
+      await store.commit('cart/insertCart', {
+        id: goods.value.id,
+        name: goods.value.name,
+        picture: goods.value.mainPictures[0],
+        price: currentSku.value.price,
+        count: num.value,
+        skuId: currentSku.value.id,
+        selected: false,
+        nowPrice: currentSku.value.price,
+        stock: currentSku.value.inventory,
+        isEffective: true,
+        attrsText: currentSku.value.specs.reduce((prev, item) => `${prev} ${item.name}: ${item.valueName}`, '')
+      })
+      Message({ type: 'success', text: '加入购物车成功' })
+    }
 
     return {
       goods,
       changeSku,
       num,
-      hotArr
+      hotArr,
+      addCart
     }
   }
 }

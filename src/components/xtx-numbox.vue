@@ -15,7 +15,7 @@ export default {
   props: {
     label: {
       type: String,
-      default: '数量'
+      default: ''
     },
     modelValue: {
       type: Number,
