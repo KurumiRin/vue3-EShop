@@ -46,6 +46,9 @@ export default {
         const skuId = pathMap[arr.join('☆')]
         const sku = props.goods.skus.find(item => item.id === skuId[0])
         emit('changeSku', sku)
+      } else {
+        // 如果没有选择完整的规则，则传递{}给父组件
+        emit('changeSku', {})
       }
     }
 

@@ -4,6 +4,7 @@
 
 import { h, render } from 'vue'
 import XtxMessage from '@/components/xtx-message.vue'
+import XtxConfirm from '@/components/xtx-confirm.vue'
 
 export default {
   install(app) {
@@ -51,14 +52,15 @@ export default {
     })
 
     app.config.globalProperties.$message = Message
+    app.config.globalProperties.$confirm = Confirm
   }
 
 }
 
 // 动态的给body创建一个盒子
-const div = document.createElement('div')
-div.setAttribute('class', 'xtx-message-container')
-document.body.appendChild(div)
+const messageDiv = document.createElement('div')
+messageDiv.setAttribute('class', 'xtx-message-container')
+document.body.appendChild(messageDiv)
 let timer = null
 export function Message({ type, text, duration = 2000 }) {
   // 渲染XtxMessage组件
@@ -70,10 +72,37 @@ export function Message({ type, text, duration = 2000 }) {
   const vNode = h(XtxMessage, { type, text })
   // 参数1：虚拟DOM
   // 参数2：挂载的DOM
-  render(vNode, div)
+  render(vNode, messageDiv)
 
   clearTimeout(timer)
   timer = setTimeout(() => {
-    render(null, div)
+    render(null, messageDiv)
   }, duration)
+}
+
+const confirmDiv = document.createElement('div')
+confirmDiv.setAttribute('class', 'xtx-confirm-container')
+document.body.appendChild(confirmDiv)
+/**
+ *
+ * @param {*} title 确认框标题
+ * @param {*} text  确认框的内容
+ * @return Promise
+ */
+export function Confirm({ title, text }) {
+  return new Promise((resolve, reject) => {
+    // 1.创建虚拟节点
+    // <XtxConfirm ::title="title" ::text="text"></XtxConfirm>
+    const cancelCallback = () => {
+      reject(new Error('取消'))
+      render(null, confirmDiv)
+    }
+    const confirmCallback = () => {
+      resolve()
+      render(null, confirmDiv)
+    }
+
+    const vNode = h(XtxConfirm, { title, text, cancelCallback, confirmCallback })
+    render(vNode, confirmDiv)
+  })
 }
