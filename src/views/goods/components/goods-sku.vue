@@ -18,6 +18,10 @@ export default {
   props: {
     goods: {
       type: Object
+    },
+    skuId: {
+      type: String,
+      default: ''
     }
   },
   setup(props, { emit }) {
@@ -63,7 +67,18 @@ export default {
       const sku = props.goods.skus.find(item => item.id === props.skuId)
       props.goods.specs.forEach((item, index) => {
         const name = sku.specs[index].valueName
+        // 需要先将所有selected置位false
+        item.values.forEach(val => {
+          val.selected = false
+        })
         item.values.find(val => val.name === name).selected = true
+
+        // item.values.forEach(val => {
+        //   val.selected = false
+        //   if (val.name === name) {
+        //     val.selected = true
+        //   }
+        // })
       })
     }
     // 禁用状态
@@ -147,6 +162,7 @@ function getSelectedSpec(specs) {
       > img {
         width: 50px;
         height: 50px;
+        margin-bottom: 5px;
         .sku-state-mixin ();
       }
       > span {

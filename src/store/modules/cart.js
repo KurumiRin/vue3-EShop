@@ -125,6 +125,51 @@ export default {
           resolve()
         }
       })
+    },
+    // 批量删除选中商品
+    batchDeleteCart(context, isClear) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // 登录 TODO
+        } else {
+          // 本地
+          // 1. 获取选中商品列表，进行遍历调用deleteCart mutataions函数
+          context.getters[isClear ? 'invalidList' : 'selectedList'].forEach(item => {
+            context.commit('deleteCart', item.skuId)
+          })
+          resolve()
+        }
+      })
+    },
+    // 修改sku规格函数
+    updateCartSku(context, { oldSkuId, newSku }) {
+      return new Promise((resolve, reject) => {
+        if (context.rootState.user.profile.token) {
+          // 登录 TODO
+        } else {
+          // 本地
+          // 但你修改了sku的时候其实skuId需要更改，相当于把原来的信息移出，创建一条新的商品信息。
+          // 1. 获取旧的商品信息
+          debugger
+          const oldGoods = context.state.list.find(item => item.skuId === oldSkuId)
+          // 2. 删除旧的商品
+          context.commit('deleteCart', oldSkuId)
+          // 3. 合并一条新的商品信息
+          const newGoods = {
+            ...oldGoods,
+            skuId: newSku.id,
+            nowPrice: newSku.price,
+            stock: newSku.inventory,
+            attrsText: newSku.specs.reduce(
+              (p, v) => `${p} ${v.name}: ${v.valueName}`,
+              ''
+            )
+          }
+          // 4. 去插入即可
+          context.commit('insertCart', newGoods)
+          resolve()
+        }
+      })
     }
   },
   getters: {
