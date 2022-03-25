@@ -55,7 +55,7 @@
                 <XtxNumbox :modelValue="item.count" :max="item.stock" @change="$event=>changeCount(item.skuId,$event)" />
               </td>
               <td class="tc">
-                <p class="f16 red">&yen;{{item.nowPrice * item.count}}</p>
+                <p class="f16 red">&yen;{{(item.nowPrice * item.count).toFixed(2)}}</p>
               </td>
               <td class="tc">
                 <p><a href="javascript:;">移入收藏夹</a></p>
@@ -104,7 +104,7 @@
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          <XtxCheckbox :modelValue="$store.getters['cart/isCheckAll']">全选</XtxCheckbox>
+          <XtxCheckbox :modelValue="$store.getters['cart/isCheckAll']" @change="changeAll">全选</XtxCheckbox>
           <a href="javascript:;" @click="batchDeleteCart()">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
           <a href="javascript:;" @click="batchDeleteCart(true)">清空失效商品</a>

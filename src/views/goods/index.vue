@@ -20,7 +20,7 @@
           <!-- 名字区组件 -->
           <GooodsName :goods="goods"></GooodsName>
           <!-- 规格组件 -->
-          <GoodsSku v-if="goods.skus" :goods="goods" @changeSku="changeSku"></GoodsSku>
+          <GoodsSku v-if="goods.skus" :goods="goods" @changeSku="changeSku" :key="goods.id"></GoodsSku>
           <!-- 数量组件 -->
           <XtxNumbox label="数量" v-model="num" :max="goods.inventory" />
           <!-- 按钮组件 -->
@@ -109,7 +109,7 @@ export default {
         return Message({ type: 'warn', text: '请选择完整信息' })
       }
       // 加入购物车
-      await store.commit('cart/insertCart', {
+      await store.dispatch('cart/insertCart', {
         id: goods.value.id,
         name: goods.value.name,
         picture: goods.value.mainPictures[0],

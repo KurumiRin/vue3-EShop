@@ -142,8 +142,11 @@ export default {
           res = await userAccountLogin(form.account, form.password)
         }
 
-        Message({ type: 'success', text: '登录成功' })
         store.commit('user/setProfile', res.result)
+
+        await store.dispatch('cart/mergeLocalCart')
+
+        Message({ type: 'success', text: '登录成功' })
         // 跳转到首页
         router.push('/')
       } catch (e) {
