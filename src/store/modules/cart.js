@@ -1,4 +1,4 @@
-import { getNewCartGoods } from '@/api/cart'
+import { getNewCartGoods, mergeLocalCart, findCartList, insertCart, deleteCart, updateCart, checkAllCart } from '@/api/cart'
 export default {
   namespaced: true,
   state: {
@@ -52,6 +52,10 @@ export default {
     deleteCart(state, skuId) {
       const index = state.list.findIndex(item => item.skuId === skuId)
       state.list.splice(index, 1)
+    },
+    // 设置购物车列表
+    setCartList(state, list) {
+      state.list = list
     }
   },
   actions: {
@@ -60,11 +64,17 @@ export default {
         // context.rootState可以拿到其他模块的
         if (context.rootState.user.profile.token) {
           // 用户登录账号
-
+          // 发送请求
+          insertCart(payload).then(() => {
+            // 插入成功，重新发请求，获取最新的购物车数据
+            context.dispatch('updateCart')
+            resolve()
+          })
+        } else {
+          // 判断用户是否登录，如果用户登录，发送请求，否则直接提交mutation
+          context.commit('insertCart', payload)
+          resolve()
         }
-        // 判断用户是否登录，如果用户登录，发送请求，否则直接提交mutation
-        context.commit('insertCart', payload)
-        resolve()
       })
     },
     updateCart(context) {
@@ -72,7 +82,11 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // 登录了
-
+          // 发送请求，获取在线的购物车数据
+          findCartList().then(data => {
+            context.commit('setCartList', data.result)
+            resolve()
+          })
         } else {
           // 没有登录，需要发送请求进行商品信息更新
           const requestArr = context.state.list.map(item => {
@@ -95,6 +109,10 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // 登录 TODO
+          deleteCart([skuId]).then(() => {
+            context.dispatch('updateCart')
+            resolve()
+          })
         } else {
           // 本地
           context.commit('deleteCart', skuId)
@@ -106,6 +124,9 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // TODO 发送请求
+          updateCart(payload).then(() => {
+            context.dispatch('updateCart')
+          })
         } else {
           context.commit('updateCart', payload)
         }
@@ -116,6 +137,10 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // 登录 TODO
+          const ids = context.getters.validList.map(item => item.skuId)
+          checkAllCart({ selected, ids }).then(() => {
+            context.dispatch('updateCart')
+          })
         } else {
           // 本地
           // 1. 获取有效的商品列表，遍历的去调用修改mutations即可
@@ -131,6 +156,10 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // 登录 TODO
+          const ids = context.getters[isClear ? 'invalidList' : 'selectedList'].map(item => item.skuId)
+          deleteCart(ids).then(() => {
+            context.dispatch('updateCart')
+          })
         } else {
           // 本地
           // 1. 获取选中商品列表，进行遍历调用deleteCart mutataions函数
@@ -146,6 +175,15 @@ export default {
       return new Promise((resolve, reject) => {
         if (context.rootState.user.profile.token) {
           // 登录 TODO
+          const oldGoods = context.state.list.find(item => item.skuId === oldSkuId)
+          deleteCart([oldGoods]).then(() => {
+            return insertCart({
+              skuId: newSku.id,
+              count: oldGoods.count
+            })
+          }).then(() => {
+            context.dispatch('updateCart')
+          })
         } else {
           // 本地
           // 但你修改了sku的时候其实skuId需要更改，相当于把原来的信息移出，创建一条新的商品信息。
@@ -170,6 +208,16 @@ export default {
           resolve()
         }
       })
+    },
+    // 合并本地购物车
+    async mergeLocalCart(context) {
+      // 存储token后调用合并API接口函数进行购物车合并
+      const cartList = context.getters.validList.map(({ skuId, selected, count }) => {
+        return { skuId, selected, count }
+      })
+      await mergeLocalCart(cartList)
+      // 合并成功后将本地购物车删除
+      context.commit('setCartList', [])
     }
   },
   getters: {

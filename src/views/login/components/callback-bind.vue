@@ -98,9 +98,13 @@ export default {
         code: form.code,
         unionId: props.unionId
       })
+
+      store.commit('user/setProfile', res.result)
+
+      await store.dispatch('cart/mergeLocalCart')
+
       // 跳转到首页
       Message({ text: '登录成功' })
-      store.commit('user/setProfile', res.result)
       router.push('/')
     }
 

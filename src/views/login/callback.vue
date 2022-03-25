@@ -55,8 +55,12 @@ export default {
         // console.log('2 openId', openId)
         try {
           const res = await userQQLogin(openId)
-          Message({ text: '登录成功' })
+
           store.commit('user/setProfile', res.result)
+
+          await store.dispatch('cart/mergeLocalCart')
+
+          Message({ text: '登录成功' })
           router.push('/')
         } catch (e) {
           console.log(e)

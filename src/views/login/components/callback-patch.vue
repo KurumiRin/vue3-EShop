@@ -101,10 +101,13 @@ export default {
       if (valid !== true) return Message({ type: 'error', text: '校验失败!' })
       // 发送请求进行完善信息
       const res = await userQQPatchLogin(props.unionId, form)
-      console.log(res)
+
+      store.commit('user/setProfile', res.result)
+
+      await store.dispatch('cart/mergeLocalCart')
+
       // 跳转到首页
       Message({ text: '登录成功' })
-      store.commit('user/setProfile', res.result)
       router.push('/')
     }
     return {

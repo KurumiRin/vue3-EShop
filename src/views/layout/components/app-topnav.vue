@@ -44,6 +44,7 @@ export default {
     })
     const logout = () => {
       store.commit('user/setProfile', {})
+      store.commit('cart/setCartList', [])
       router.push('/login')
       Message({ type: 'success', text: '退出成功' })
     }
