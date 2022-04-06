@@ -12,9 +12,16 @@
       <a href="javascript:;">修改地址</a>
     </div>
     <div class="action">
-      <XtxButton class="btn">切换地址</XtxButton>
+      <XtxButton class="btn" @click="dialogVisible = true">切换地址</XtxButton>
       <XtxButton class="btn">添加地址</XtxButton>
     </div>
+    <xtx-dialog title="选择收货地址" v-model:visible="dialogVisible">
+      <div>表单</div>
+      <template #footer>
+        <XtxButton type="gray" style="margin-right:20px" @click="dialogVisible = false">取消</XtxButton>
+        <XtxButton type="primary">确认</XtxButton>
+      </template>
+    </xtx-dialog>
   </div>
 </template>
 <script>
@@ -48,8 +55,11 @@ export default {
       deep: true
     })
 
+    const dialogVisible = ref(false)
+
     return {
-      showAddress
+      showAddress,
+      dialogVisible
     }
   }
 }
