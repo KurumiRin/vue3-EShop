@@ -10,7 +10,7 @@
         <!-- 收货地址 -->
         <h3 class="box-title">收货地址</h3>
         <div class="box-body">
-          <CheckoutAddress :list="checkoutInfo.userAddresses" v-if="checkoutInfo.userAddresses"></CheckoutAddress>
+          <CheckoutAddress :list="checkoutInfo.userAddresses" @changeAddress="changeAddress"></CheckoutAddress>
         </div>
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
@@ -100,8 +100,13 @@ export default {
     findCheckoutInfo().then(res => {
       checkoutInfo.value = res.result
     })
+
+    const changeAddress = (addressId) => {
+      console.log(addressId)
+    }
     return {
-      checkoutInfo
+      checkoutInfo,
+      changeAddress
     }
   }
 }

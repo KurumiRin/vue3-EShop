@@ -15,11 +15,17 @@
       <XtxButton class="btn" @click="dialogVisible = true">切换地址</XtxButton>
       <XtxButton class="btn">添加地址</XtxButton>
     </div>
-    <xtx-dialog title="选择收货地址" v-model:visible="dialogVisible">
-      <div>表单</div>
+    <xtx-dialog title="切换收货地址" v-model:visible="dialogVisible">
+      <div class="text item" v-for="item in list" :key="item.id" @click="selectedAddress = item" :class="{ active: selectedAddress?.id === item.id }">
+        <ul>
+          <li><span>收<i />货<i />人：</span>{{ item.receiver }}</li>
+          <li><span>联系方式：</span>{{ item.contact }}</li>
+          <li><span>收货地址：</span>{{ item.fullLocation.replace(/ /g,'')+item.address }}</li>
+        </ul>
+      </div>
       <template #footer>
         <XtxButton type="gray" style="margin-right:20px" @click="dialogVisible = false">取消</XtxButton>
-        <XtxButton type="primary">确认</XtxButton>
+        <XtxButton type="primary" @click="confirmAddress">确认</XtxButton>
       </template>
     </xtx-dialog>
   </div>
@@ -34,7 +40,7 @@ export default {
       default: () => []
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
     /*
       确定默认的收货地址
       1.从list中查找isDefault为0的默认收货地址
@@ -49,6 +55,9 @@ export default {
         } else {
           showAddress.value = { ...props.list[0] }
         }
+        selectedAddress.value = showAddress.value
+        // 需要子传父把默认显示的收货地址id传给父组件
+        emit('changeAddress', showAddress.value.id)
       }
     }, {
       immediate: true,
@@ -57,9 +66,18 @@ export default {
 
     const dialogVisible = ref(false)
 
+    const selectedAddress = ref(null)
+    const confirmAddress = () => {
+      dialogVisible.value = false
+      showAddress.value = selectedAddress.value
+      emit('changeAddress', selectedAddress.value.id)
+    }
+
     return {
       showAddress,
-      dialogVisible
+      dialogVisible,
+      selectedAddress,
+      confirmAddress
     }
   }
 }
@@ -74,6 +92,20 @@ export default {
     min-height: 90px;
     display: flex;
     align-items: center;
+    &.item {
+      border: 1px solid #f5f5f5;
+      margin-bottom: 10px;
+      cursor: pointer;
+      &.active,
+      &:hover {
+        border-color: @xtxColor;
+        background: lighten(@xtxColor, 50%);
+      }
+      > ul {
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
     .none {
       line-height: 90px;
       color: #999;
