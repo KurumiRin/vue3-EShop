@@ -49,7 +49,7 @@ import { account, mobile, code, password, rePassword } from '@/utils/validate'
 import { useCounter } from '@/hooks'
 import { userQQPatchCode, userQQPatchLogin } from '@/api/user'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { Message } from '@/components'
 export default {
   name: 'CallbackPatch',
@@ -81,6 +81,7 @@ export default {
     const target = ref(null)
     const { start, time } = useCounter()
     const router = useRouter()
+    const route = useRoute()
     const store = useStore()
     const send = async() => {
       if (time.value > 0) return
@@ -108,7 +109,9 @@ export default {
 
       // 跳转到首页
       Message({ text: '登录成功' })
-      router.push('/')
+      const redirectUrl = route.query.redirectUrl || '/'
+      router.push(redirectUrl)
+      // router.push('/')
     }
     return {
       form,

@@ -85,7 +85,7 @@ import { Form, Field, configure } from 'vee-validate'
 import { account, mobile, password, code, isAgree } from '@/utils/validate'
 import { Message } from '@/components/index'
 import { userAccountLogin, userMobileLogin, userMobileLoginMsg } from '@/api/user'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 // import { useIntervalFn } from '@vueuse/core'
 import { useCounter } from '@/hooks'
@@ -128,6 +128,7 @@ export default {
     // 登录
     const target = ref(null)
     const router = useRouter()
+    const route = useRoute()
     const store = useStore()
     const login = async () => {
       // 对整体表单进行校验
@@ -148,7 +149,9 @@ export default {
 
         Message({ type: 'success', text: '登录成功' })
         // 跳转到首页
-        router.push('/')
+        const redirectUrl = route.query.redirectUrl || '/'
+        router.push(redirectUrl)
+        // router.push('/')
       } catch (e) {
         Message({ type: 'error', text: e.response.data.message })
       }

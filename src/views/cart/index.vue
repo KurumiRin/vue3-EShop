@@ -112,7 +112,7 @@
         <div class="total">
           共 {{$store.getters['cart/validTotal']}} 件商品，已选择 {{$store.getters['cart/selectedTotal']}} 件，商品合计：
           <span class="red">¥{{$store.getters['cart/selectedAmount']}}</span>
-          <XtxButton type="primary">下单结算</XtxButton>
+          <XtxButton type="primary" @click="goCheckout">下单结算</XtxButton>
         </div>
       </div>
       <!-- 猜你喜欢 -->
@@ -127,6 +127,7 @@ import CartSku from './components/cart-sku.vue'
 import { useStore } from 'vuex'
 import CartNone from './components/cart-none.vue'
 import { Confirm, Message } from '@/components'
+import { useRouter } from 'vue-router'
 export default {
   name: 'XtxCartPage',
   components: { GoodRelevant, CartNone, CartSku },
@@ -175,13 +176,30 @@ export default {
       store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
     }
 
+    // 下单结算
+    const router = useRouter()
+
+    const goCheckout = () => {
+      if (store.getters['cart/selectedList'].length === 0) {
+        return Message({ type: 'warn', text: '请选择至少一件商品' })
+      }
+      if (!store.state.user.profile.token) {
+        return Confirm({ text: '结算前请先登录,您是否要去登录?' }).then(() => {
+          // 点击确定跳转登录页面（全局导航守卫中做了处理）
+          router.push('/member/checkout')
+        }).catch(() => {})
+      }
+      // 登录状态下正常跳转到结算页面
+      router.push('/member/checkout')
+    }
     return {
       changeChecked,
       changeAll,
       deleteCart,
       batchDeleteCart,
       changeCount,
-      updateCartSku
+      updateCartSku,
+      goCheckout
     }
   }
 }

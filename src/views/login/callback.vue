@@ -61,7 +61,11 @@ export default {
           await store.dispatch('cart/mergeLocalCart')
 
           Message({ text: '登录成功' })
-          router.push('/')
+          // 通过第三方登录，跳转到首页
+          const redirectUrl = localStorage.getItem('redirectUrl') || '/'
+          localStorage.removeItem('redirectUrl')
+          router.push(redirectUrl)
+          // router.push('/')
         } catch (e) {
           console.log(e)
           Message({ type: 'error', text: 'qq未绑定' })
