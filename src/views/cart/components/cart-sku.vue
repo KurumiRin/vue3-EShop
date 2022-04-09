@@ -54,7 +54,6 @@ export default {
     const currSku = ref({})
     const changeSku = sku => {
       currSku.value = sku
-      // console.log('sku发生了变化', sku)
     }
 
     // 点击确认的时候，提交sku信息给购物车组件

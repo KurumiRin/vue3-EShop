@@ -33,3 +33,26 @@ export const editAddress = address => {
     data: address
   })
 }
+
+/**
+ * 提交订单
+ * @param {Object} order - 订单信息对象
+ */
+export const createOrder = order => {
+  return request({
+    method: 'post',
+    url: '/member/order',
+    data: order
+  })
+}
+
+/**
+ * 获取订单详情
+ * @param {String} id - 订单ID
+ */
+export const findOrder = id => {
+  return request({
+    method: 'get',
+    url: '/member/order/' + id
+  })
+}

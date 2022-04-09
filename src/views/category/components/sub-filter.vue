@@ -36,7 +36,6 @@ export default {
         if (!route.path.includes('sub')) return
         // 发送请求
         findSubCategoryFilter(value).then(({ result }) => {
-          console.log(result)
           result.brands.selected = null
           result.brands.unshift({ id: null, name: '全部' })
           result.saleProperties.forEach(item => {

@@ -49,10 +49,8 @@ export default {
     // 判断qq是否登录
     if (QC.Login.check()) {
     // 获取openId
-      // console.log('1', 'check')
       QC.Login.getMe(async openId => {
         unionId.value = openId
-        // console.log('2 openId', openId)
         try {
           const res = await userQQLogin(openId)
 
@@ -67,7 +65,6 @@ export default {
           router.push(redirectUrl)
           // router.push('/')
         } catch (e) {
-          console.log(e)
           Message({ type: 'error', text: 'qq未绑定' })
         }
       })

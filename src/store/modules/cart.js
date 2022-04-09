@@ -37,7 +37,6 @@ export default {
     },
     // 更新购物车商品信息
     updateCart(state, goods) {
-      // console.log(goods)
       const sku = state.list.find(item => item.skuId === goods.skuId)
       for (const k in goods) {
         if (goods[k] !== null && goods[k] !== undefined && goods[k] !== '') {

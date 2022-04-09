@@ -36,7 +36,6 @@ export default {
   },
   setup(props) {
     const sliders = useRelGoodsData(props.goodsId)
-    console.log(sliders)
     return {
       sliders
     }

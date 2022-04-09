@@ -52,7 +52,6 @@ export default {
     const onLoad = () => {
       loading.value = true
       findSubCategoryGoods(reqParams).then(({ result }) => {
-        console.log(result)
         if (result.items.length) {
           goodsList.value.push(...result.items)
           reqParams.page++
@@ -80,7 +79,6 @@ export default {
     )
 
     const changeSort = (sortParams) => {
-      // console.log(sortParams)
       reqParams = Object.assign(reqParams, sortParams)
       reqParams.page = 1
       goodsList.value = []
