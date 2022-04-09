@@ -90,17 +90,26 @@
 </template>
 <script>
 import { findCheckoutInfo } from '@/api/order'
-import { ref } from 'vue'
+import { ref, provide } from 'vue'
 import CheckoutAddress from './components/checkout-address.vue'
 export default {
   name: 'XtxPayCheckoutPage',
-  components: { CheckoutAddress },
+  components: {
+    CheckoutAddress
+  },
   setup() {
     const checkoutInfo = ref({})
-    findCheckoutInfo().then(res => {
-      checkoutInfo.value = res.result
-    })
 
+    const getInfo = () => {
+      console.log('23333333')
+      findCheckoutInfo().then(res => {
+        checkoutInfo.value = res.result
+      })
+    }
+    getInfo()
+    provide('getInfo', getInfo)
+
+    // 拿到选中给的地址id，为后续支付功能准备
     const changeAddress = (addressId) => {
       console.log(addressId)
     }

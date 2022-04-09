@@ -1,7 +1,7 @@
 <template>
   <div class="xtx-city" ref="target">
     <div class="select" @click="active = !active" :class="{ active }">
-      <span class="placeholder" v-if="!fullLocation">请选择配送地址</span>
+      <span class="placeholder" v-if="!fullLocation">{{ placeholder }}</span>
       <template v-else>
         <span class="value">{{ fullLocation }}</span>
         <i class="iconfont icon-angle-down"></i>
@@ -20,7 +20,11 @@ import axios from 'axios'
 export default {
   name: 'XtxCity',
   props: {
-    fullLocation: String
+    fullLocation: String,
+    placeholder: {
+      type: String,
+      default: '请选择配送地址'
+    }
   },
   setup(props, { emit }) {
     const active = ref(false)

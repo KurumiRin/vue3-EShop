@@ -9,11 +9,11 @@
         <li><span>联系方式：</span>{{ showAddress.contact }}</li>
         <li><span>收货地址：</span>{{ showAddress.fullLocation + showAddress.address }}</li>
       </ul>
-      <a href="javascript:;">修改地址</a>
+      <a href="javascript:;" @click="target.open(showAddress)">修改地址</a>
     </div>
     <div class="action">
       <XtxButton class="btn" @click="dialogVisible = true">切换地址</XtxButton>
-      <XtxButton class="btn">添加地址</XtxButton>
+      <XtxButton class="btn" @click="target.open()">添加地址</XtxButton>
     </div>
     <xtx-dialog title="切换收货地址" v-model:visible="dialogVisible">
       <div class="text item" v-for="item in list" :key="item.id" @click="selectedAddress = item" :class="{ active: selectedAddress?.id === item.id }">
@@ -28,12 +28,17 @@
         <XtxButton type="primary" @click="confirmAddress">确认</XtxButton>
       </template>
     </xtx-dialog>
+    <AddressEdit ref="target"></AddressEdit>
   </div>
 </template>
 <script>
-import { ref, watch } from 'vue'
+import { provide, ref, watch } from 'vue'
+import AddressEdit from './address-edit.vue'
 export default {
   name: 'CheckoutAddress',
+  components: {
+    AddressEdit
+  },
   props: {
     list: {
       type: Array,
@@ -47,6 +52,8 @@ export default {
       2.如果没有，把数组的第一项作为默认收货地址
     */
     const showAddress = ref(null)
+    const selectedAddress = ref(null)
+
     watch(() => props.list, () => {
       if (props.list.length > 0) {
         const defaultAddress = props.list.find(item => item.isDefault === 0)
@@ -66,18 +73,38 @@ export default {
 
     const dialogVisible = ref(false)
 
-    const selectedAddress = ref(null)
     const confirmAddress = () => {
       dialogVisible.value = false
       showAddress.value = selectedAddress.value
-      emit('changeAddress', selectedAddress.value.id)
+      emit('changeAddress', selectedAddress.value?.id)
     }
+
+    const target = ref(null)
+
+    const updateAddress = (address) => {
+      const editAddress = props.list.find(item => item.id === address.id)
+      if (editAddress) {
+        showAddress.value = address
+        selectedAddress.value = address
+        // 修改
+        for (const key in editAddress) {
+          editAddress[key] = address[key]
+        }
+      } else {
+        // 这里暂时禁用eslint，后续可以把vfor循环绑定的props再套一层reactive,避免直接修改props
+        // eslint-disable-next-line vue/no-mutating-props
+        props.list.unshift(props)
+      }
+    }
+
+    provide('updateAddress', updateAddress)
 
     return {
       showAddress,
       dialogVisible,
       selectedAddress,
-      confirmAddress
+      confirmAddress,
+      target
     }
   }
 }
