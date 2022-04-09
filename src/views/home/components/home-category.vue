@@ -23,7 +23,7 @@
       </h4>
       <ul v-if="currentCategory?.goods">
         <li v-for="item in currentCategory?.goods" :key="item.id">
-          <RouterLink to="/">
+          <RouterLink :to="`/product/${item.id}`">
             <img v-lazy="item.picture" alt="" />
             <div class="info">
               <p class="name ellipsis-2">{{item.name}}</p>

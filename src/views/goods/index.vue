@@ -139,6 +139,8 @@ function useGoods() {
   const goods = ref({})
   const route = useRoute()
   watch(() => route.params.id, async (value) => {
+    // 解决跳转回首页时回触发的bug
+    if (!value) return
     const res = await findGoods(value)
     goods.value = res.result
   }, {
