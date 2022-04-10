@@ -39,6 +39,22 @@ const routes = [
       {
         path: '/pay/callback',
         component: () => import('@/views/member/pay/result')
+      },
+      {
+        path: '/member',
+        component: () => import('@/views/member/layout'),
+        children: [
+          {
+            // 个人中心
+            path: '/member',
+            component: () => import('@/views/member/home')
+          },
+          {
+            // 订单
+            path: '/member/order',
+            component: () => import('@/views/member/order')
+          }
+        ]
       }
     ]
   },
@@ -61,6 +77,8 @@ const router = createRouter({
       top: 0
     }
   }
+  // 全局修改类名
+  // linkExactActiveClass: 'active'
 })
 
 // 不能通过useStore来获取store对象,useStore只能在setup里使用
