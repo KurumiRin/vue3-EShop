@@ -17,6 +17,7 @@ import AppFooter from './components/app-footer.vue'
 import AppHeaderSticky from './components/app-header-sticky.vue'
 import { useStore } from 'vuex'
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Layout',
   components: {
     AppTopNav,

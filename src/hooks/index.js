@@ -1,5 +1,6 @@
 import { onBeforeMount, onMounted, ref, onBeforeUnmount } from 'vue'
 import { useIntersectionObserver, useIntervalFn } from '@vueuse/core'
+import dayjs from 'dayjs'
 
 export function useWindowScroll() {
   const x = ref(0)
@@ -52,6 +53,7 @@ export function useLazyData(apiFn) {
   }
 }
 
+// 倒计时
 export function useCounter(num = 60) {
   const time = ref(0)
   // resume：开启定时器
@@ -77,5 +79,32 @@ export function useCounter(num = 60) {
   return {
     time,
     start
+  }
+}
+
+// xx分xx秒倒计时
+export function useTimeDown() {
+  const time = ref(0)
+  const formatTime = ref('')
+  const { pause, resume } = useIntervalFn(() => {
+    time.value--
+    formatTime.value = dayjs.unix(time.value).format('mm分ss秒')
+    if (time.value <= 0) {
+      pause()
+    }
+  }, 1000, {
+    immediate: false
+  })
+  onBeforeUnmount(() => {
+    pause()
+  })
+  const start = (num = 0) => {
+    time.value = num
+    resume()
+  }
+
+  return {
+    start,
+    formatTime
   }
 }
