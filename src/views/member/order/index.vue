@@ -88,9 +88,10 @@ export default {
       requestParams.orderState = index
     }
 
-    const onCancel = (order) => {
-      target.value.open(order)
-    }
+    // 取消按钮：后续封装
+    // const onCancel = (order) => {
+    //   target.value.open(order)
+    // }
 
     const target = ref(null)
 
@@ -135,7 +136,8 @@ export default {
       loading,
       total,
       requestParams,
-      onCancel,
+      // onCancel,
+      ...useCancel(target),
       target,
       onDelete,
       // onConfirm,
@@ -162,6 +164,16 @@ export const useConfirm = (fn) => {
   }
   return {
     onConfirm
+  }
+}
+
+export const useCancel = (target) => {
+  const onCancel = (order) => {
+    target.value.open(order)
+  }
+
+  return {
+    onCancel
   }
 }
 </script>

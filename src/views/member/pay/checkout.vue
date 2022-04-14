@@ -29,7 +29,7 @@
               <tr v-for="item in checkoutInfo.goods" :key="item.skuId">
                 <td>
                   <RouterLink :to="`/product/${item.id}`" class="info">
-                    <img :src="item.picture" alt="">
+                    <img :src="item.picture" alt />
                     <div class="right">
                       <p>{{ item.name }}</p>
                       <p>{{ item.attrsText }}</p>
@@ -71,7 +71,10 @@
               <dd>¥{{ checkoutInfo.summary.totalPrice }}</dd>
             </dl>
             <dl>
-              <dt>运<i></i>费：</dt>
+              <dt>
+                运
+                <i></i>费：
+              </dt>
               <dd>¥{{ checkoutInfo.summary.postFee }}</dd>
             </dl>
             <dl>
@@ -89,11 +92,11 @@
   </div>
 </template>
 <script>
-import { createOrder, findCheckoutInfo } from '@/api/order'
+import { createOrder, findCheckoutInfo, findOrderRepurchase } from '@/api/order'
 import { ref, provide, reactive } from 'vue'
 import CheckoutAddress from './components/checkout-address.vue'
 import { Message } from '@/components'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 export default {
   name: 'XtxPayCheckoutPage',
   components: {
@@ -102,16 +105,28 @@ export default {
   setup() {
     const checkoutInfo = ref({})
 
-    const getInfo = () => {
-      findCheckoutInfo().then(res => {
-        checkoutInfo.value = res.result
-        requestParams.goods = res.result.goods.map(item => {
-          return {
-            skuId: item.skuId,
-            count: item.count
-          }
-        })
+    const goodsInfo = (res) => {
+      checkoutInfo.value = res.result
+      requestParams.goods = res.result.goods.map(item => {
+        return {
+          skuId: item.skuId,
+          count: item.count
+        }
       })
+    }
+
+    const getInfo = () => {
+      const route = useRoute()
+      if (route.query.orderId) {
+        findOrderRepurchase(route.query.orderId).then(res => {
+          // console.log(res)
+          goodsInfo(res)
+        })
+      } else {
+        findCheckoutInfo().then(res => {
+          goodsInfo(res)
+        })
+      }
     }
     getInfo()
     provide('getInfo', getInfo)
@@ -131,7 +146,7 @@ export default {
 
     const router = useRouter()
 
-    const submitOrder = async() => {
+    const submitOrder = async () => {
       if (!requestParams.addressId) {
         return Message({ type: 'warn', text: '请选择收货地址!' })
       }
