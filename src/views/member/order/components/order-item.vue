@@ -80,7 +80,7 @@ start(props.order.countdown)
           @click="$emit('onConfirm', order)"
         >确认收货</XtxButton>
         <p>
-          <a href="javascript:;">查看详情</a>
+          <RouterLink :to="`/member/order/${order.id}`">查看详情</RouterLink>
         </p>
         <p v-if="order.orderState === 1">
           <a href="javascript:;" @click="$emit('onCancel', order)">取消订单</a>

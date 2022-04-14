@@ -1,7 +1,8 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, RouterView } from 'vue-router'
 import Layout from '@/views/layout'
 import Home from '@/views/home'
 import store from '@/store'
+// import { h } from 'vue'
 
 const routes = [
   {
@@ -51,8 +52,23 @@ const routes = [
           },
           {
             // 订单
+            // 解决模糊匹配路由高亮的问题
+            // 具体详情看：https://github.com/vuejs/rfcs/blob/master/active-rfcs/0028-router-active-link.md#unrelated-but-similiar-routes
             path: '/member/order',
-            component: () => import('@/views/member/order')
+            // component: { render: () => h(RouterView) },
+            component: RouterView,
+            children: [
+              {
+                // 订单
+                path: '/member/order',
+                component: () => import('@/views/member/order')
+              },
+              {
+                // 订单详情
+                path: '/member/order/:id',
+                component: () => import('@/views/member/order/detail')
+              }
+            ]
           }
         ]
       }
