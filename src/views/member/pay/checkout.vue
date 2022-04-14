@@ -97,6 +97,7 @@ import { ref, provide, reactive } from 'vue'
 import CheckoutAddress from './components/checkout-address.vue'
 import { Message } from '@/components'
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 export default {
   name: 'XtxPayCheckoutPage',
   components: {
@@ -105,26 +106,29 @@ export default {
   setup() {
     const checkoutInfo = ref({})
 
-    const goodsInfo = (res) => {
-      checkoutInfo.value = res.result
-      requestParams.goods = res.result.goods.map(item => {
-        return {
-          skuId: item.skuId,
-          count: item.count
-        }
-      })
-    }
+    const route = useRoute()
 
     const getInfo = () => {
-      const route = useRoute()
-      if (route.query.orderId) {
+      if (route?.query.orderId) {
         findOrderRepurchase(route.query.orderId).then(res => {
           // console.log(res)
-          goodsInfo(res)
+          checkoutInfo.value = res.result
+          requestParams.goods = res.result.goods.map(item => {
+            return {
+              skuId: item.skuId,
+              count: item.count
+            }
+          })
         })
       } else {
         findCheckoutInfo().then(res => {
-          goodsInfo(res)
+          checkoutInfo.value = res.result
+          requestParams.goods = res.result.goods.map(item => {
+            return {
+              skuId: item.skuId,
+              count: item.count
+            }
+          })
         })
       }
     }
@@ -145,12 +149,15 @@ export default {
     })
 
     const router = useRouter()
+    const store = useStore()
 
     const submitOrder = async () => {
       if (!requestParams.addressId) {
         return Message({ type: 'warn', text: '请选择收货地址!' })
       }
       const res = await createOrder(requestParams)
+      store.dispatch('cart/updateCart')
+
       router.push({
         path: '/member/pay',
         query: { id: res.result.id }

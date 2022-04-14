@@ -1,5 +1,5 @@
 <template>
-  <XtxDialog :title="formData.id  ?  '修改收货地址' : '添加收货地址' " v-model:visible="dialogVisible">
+  <XtxDialog :title="formData.id ? '修改收货地址' : '添加收货地址'" v-model:visible="dialogVisible">
     <div class="address-edit">
       <div class="xtx-form">
         <div class="xtx-form-item">
@@ -17,7 +17,11 @@
         <div class="xtx-form-item">
           <div class="label">地区：</div>
           <div class="field">
-            <XtxCity :fullLocation="formData.fullLocation" placeholder="请选择所在地区" @changeCity="changeCity" />
+            <XtxCity
+              :fullLocation="formData.fullLocation"
+              placeholder="请选择所在地区"
+              @changeCity="changeCity"
+            />
           </div>
         </div>
         <div class="xtx-form-item">
@@ -59,6 +63,8 @@ import { Message } from '@/components'
 export default {
   name: 'AddressEdit',
   setup() {
+    const getInfo = inject('getInfo')
+
     const dialogVisible = ref(false)
 
     // 打开函数
@@ -92,7 +98,6 @@ export default {
       // formData.fullLocation = city.fullLocation
       formData.fullLocation = `${city.provinceName} ${city.cityName} ${city.countyName}`
     }
-    const getInfo = inject('getInfo')
     const updateAddress = inject('updateAddress')
     const confirm = async () => {
       if (formData.id) {
