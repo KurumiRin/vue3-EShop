@@ -14,6 +14,7 @@
       </template>
     </Suspense>
     <!-- 订单商品信息 -->
+    <OrderInfo :order="order"></OrderInfo>
   </div>
 </template>
 <script>
@@ -23,12 +24,14 @@ import DetailLogistics from './components/detail-logistics'
 import { ref } from 'vue'
 import { findOrder } from '@/api/order'
 import { useRoute } from 'vue-router'
+import OrderInfo from './components/order-info.vue'
 export default {
   name: 'OrderDetailPage',
   components: {
     DetailAction,
     DetailSteps,
-    DetailLogistics
+    DetailLogistics,
+    OrderInfo
   },
   setup() {
     const order = ref(null)

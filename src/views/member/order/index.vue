@@ -106,19 +106,19 @@ export default {
         .catch(e => { })
     }
 
-    // 封装逻辑-确认收货
-    const onConfirm = item => {
-      Confirm({ text: '您确认收到货吗？确认后货款将会打给卖家。' })
-        .then(() => {
-          confirmOrder(item.id).then(() => {
-            Message({ text: '确认收货成功', type: 'success' })
-            // 重新渲染
-            findList()
-            item.orderState = 4
-          })
-        })
-        .catch(e => { })
-    }
+    // // 封装逻辑-确认收货
+    // const onConfirm = item => {
+    //   Confirm({ text: '您确认收到货吗？确认后货款将会打给卖家。' })
+    //     .then(() => {
+    //       confirmOrder(item.id).then(() => {
+    //         Message({ text: '确认收货成功', type: 'success' })
+    //         // 重新渲染
+    //         findList()
+    //         item.orderState = 4
+    //       })
+    //     })
+    //     .catch(e => { })
+    // }
 
     // 查看物流的ref
     const logisticsOrderCom = ref(null)
@@ -138,13 +138,32 @@ export default {
       onCancel,
       target,
       onDelete,
-      onConfirm,
+      // onConfirm,
+      ...useConfirm(findList),
       onLogistics,
       logisticsOrderCom
     }
   }
 }
 
+export const useConfirm = (fn) => {
+  // 封装逻辑-确认收货
+  const onConfirm = item => {
+    Confirm({ text: '您确认收到货吗？确认后货款将会打给卖家。' })
+      .then(() => {
+        confirmOrder(item.id).then(() => {
+          Message({ text: '确认收货成功', type: 'success' })
+          // 重新渲染
+          fn && fn()
+          item.orderState = 4
+        })
+      })
+      .catch(e => { })
+  }
+  return {
+    onConfirm
+  }
+}
 </script>
 <style scoped lang="less">
 .order-list {
