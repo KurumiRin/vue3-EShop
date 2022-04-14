@@ -6,25 +6,37 @@
           <li>
             <RouterLink to="/member">
               <i class="iconfont icon-user"></i>
-              {{profile.nickname || profile.account}}
+              {{ profile.nickname || profile.account }}
             </RouterLink>
           </li>
-          <li><a href="javascript:;" @click="logout">退出登录</a></li>
+          <li>
+            <a href="javascript:;" @click="logout">退出登录</a>
+          </li>
         </template>
         <template v-else>
           <li>
             <RouterLink to="/login">请先登录</RouterLink>
           </li>
-          <li><a href="javascript:;">免费注册</a></li>
+          <li>
+            <a href="javascript:;">免费注册</a>
+          </li>
         </template>
-        <li><a href="javascript:;">我的订单</a></li>
+        <li>
+          <RouterLink to="/member/order">我的订单</RouterLink>
+        </li>
         <li>
           <RouterLink to="/member">会员中心</RouterLink>
         </li>
-        <li><a href="javascript:;">帮助中心</a></li>
-        <li><a href="javascript:;">关于我们</a></li>
         <li>
-          <a href="javascript:;"><i class="iconfont icon-phone"></i>手机版</a>
+          <a href="javascript:;">帮助中心</a>
+        </li>
+        <li>
+          <a href="javascript:;">关于我们</a>
+        </li>
+        <li>
+          <a href="javascript:;">
+            <i class="iconfont icon-phone"></i>手机版
+          </a>
         </li>
       </ul>
     </div>

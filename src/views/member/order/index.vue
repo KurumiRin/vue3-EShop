@@ -1,29 +1,54 @@
 <template>
   <div class="member-order-page">
     <XtxTabs v-model="activeName" @tabClick="tabClick">
-      <XtxTabsPanel v-for="item in orderStatus" :key="item.name" :label="item.label" :name="item.name">
+      <XtxTabsPanel
+        v-for="item in orderStatus"
+        :key="item.name"
+        :label="item.label"
+        :name="item.name"
+      >
         <!-- {{item.label}} -->
         <div class="order-list">
           <div v-if="loading" class="loading"></div>
           <div class="none" v-if="!loading && orderList.length === 0">暂无数据</div>
-          <OrderItem v-for="item in orderList" :key="item.id" :order="item"></OrderItem>
+          <OrderItem
+            v-for="item in orderList"
+            :key="item.id"
+            :order="item"
+            @onCancel="onCancel"
+            @onDelete="onDelete"
+            @onConfirm="onConfirm"
+            @onLogistics="onLogistics"
+          ></OrderItem>
         </div>
         <!-- 分页组件 -->
-        <XtxPagination v-if="total > requestParams.pageSize" @current-change="requestParams.page = $event"
-          :total="total" :page-size="requestParams.pageSize" :current-page="requestParams.page"></XtxPagination>
+        <XtxPagination
+          v-if="total > requestParams.pageSize"
+          @current-change="requestParams.page = $event"
+          :total="total"
+          :page-size="requestParams.pageSize"
+          :current-page="requestParams.page"
+        ></XtxPagination>
       </XtxTabsPanel>
     </XtxTabs>
   </div>
+  <OrderCancel ref="target"></OrderCancel>
+  <OrderLogistics ref="logisticsOrderCom"></OrderLogistics>
 </template>
 <script>
 import { reactive, ref, watch } from 'vue'
 import { orderStatus } from '@/api/constants'
-import { findOrderList } from '@/api/order'
+import { delteOrder, findOrderList, confirmOrder } from '@/api/order'
 import OrderItem from './components/order-item.vue'
+import OrderCancel from './components/order-cancel.vue'
+import OrderLogistics from './components/order-logistics.vue'
+import { Confirm, Message } from '@/components'
 export default {
   name: 'MemberOrderPage',
   components: {
-    OrderItem
+    OrderItem,
+    OrderCancel,
+    OrderLogistics
   },
   setup() {
     const activeName = ref('all')
@@ -39,8 +64,9 @@ export default {
     const total = ref(0)
     // 订单列表
     const orderList = ref([])
-    // 查询订单
-    watch(requestParams, () => {
+
+    // 封装获取订单列表的方法
+    const findList = () => {
       loading.value = true
       findOrderList(requestParams).then(res => {
         orderList.value = res.result.items
@@ -49,6 +75,10 @@ export default {
         loading.value = false
         // console.log(orderList.value)
       })
+    }
+    // 查询订单
+    watch(requestParams, () => {
+      findList()
     }, {
       immediate: true
     })
@@ -57,6 +87,46 @@ export default {
       // console.log('click')
       requestParams.orderState = index
     }
+
+    const onCancel = (order) => {
+      target.value.open(order)
+    }
+
+    const target = ref(null)
+
+    const onDelete = item => {
+      Confirm({ text: '您确认删除该条订单吗？' })
+        .then(() => {
+          delteOrder([item.id]).then(() => {
+            Message({ text: '删除订单成功', type: 'success' })
+            // 重新渲染
+            findList()
+          })
+        })
+        .catch(e => { })
+    }
+
+    // 封装逻辑-确认收货
+    const onConfirm = item => {
+      Confirm({ text: '您确认收到货吗？确认后货款将会打给卖家。' })
+        .then(() => {
+          confirmOrder(item.id).then(() => {
+            Message({ text: '确认收货成功', type: 'success' })
+            // 重新渲染
+            findList()
+            item.orderState = 4
+          })
+        })
+        .catch(e => { })
+    }
+
+    // 查看物流的ref
+    const logisticsOrderCom = ref(null)
+
+    // 查看物流
+    const onLogistics = item => {
+      logisticsOrderCom.value.open(item)
+    }
     return {
       activeName,
       orderStatus,
@@ -64,7 +134,13 @@ export default {
       tabClick,
       loading,
       total,
-      requestParams
+      requestParams,
+      onCancel,
+      target,
+      onDelete,
+      onConfirm,
+      onLogistics,
+      logisticsOrderCom
     }
   }
 }
@@ -84,7 +160,8 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  background: rgba(255, 255, 255, .9) url(~@/assets/images/loading.gif) no-repeat center 200px;
+  background: rgba(255, 255, 255, 0.9) url(~@/assets/images/loading.gif)
+    no-repeat center 200px;
 }
 
 .none {
@@ -140,7 +217,7 @@ export default {
       text-align: center;
       padding: 20px;
 
-      >p {
+      > p {
         padding-top: 10px;
       }
 

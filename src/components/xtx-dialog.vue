@@ -1,6 +1,6 @@
 <template>
-  <div class="xtx-dialog" v-show="visible" :class="{fade}">
-    <div class="wrapper" :class="{fade}" ref="target">
+  <div class="xtx-dialog" v-show="visible" :class="{ fade }">
+    <div class="wrapper" :class="{ fade }" ref="target">
       <div class="header">
         <h3>{{ title }}</h3>
         <a href="JavaScript:;" class="iconfont icon-close-new" @click="close"></a>
@@ -9,9 +9,7 @@
         <slot></slot>
       </div>
       <div class="footer">
-        <slot name="footer">
-
-        </slot>
+        <slot name="footer"></slot>
       </div>
     </div>
   </div>
@@ -31,12 +29,14 @@ export default {
       default: false
     }
   },
-  setup (props, { emit }) {
+  setup(props, { emit }) {
     const fade = ref(false)
     watch(() => props.visible, value => {
       setTimeout(() => {
         fade.value = value
       })
+    }, {
+      immediate: true
     })
 
     const close = () => {
